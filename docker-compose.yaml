@@ -1,0 +1,148 @@
+version: '3.3'
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.2.1
+    hostname: zookeeper
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+
+  kafka_broker:
+    image: confluentinc/cp-server:7.2.1
+    hostname: kafka_broker
+    container_name: kafka_broker
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    healthcheck:
+      test: ["CMD-SHELL", "sleep 1;"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_LOG4J_LOGGERS: org.apache.zookeeper=ERROR,org.apache.kafka=ERROR, kafka=ERROR, kafka.cluster=ERROR,kafka.controller=ERROR, kafka.coordinator=ERROR,kafka.log=ERROR,kafka.server=ERROR,kafka.zookeeper=ERROR,state.change.logger=ERROR
+      KAFKA_LOG4J_ROOT_LOGLEVEL: ERROR
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka_broker:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CONFLUENT_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: kafka_broker:29092
+      CONFLUENT_METRICS_ENABLE: 'true'
+
+  schema-registry:
+    image: confluentinc/cp-schema-registry:7.2.1
+    hostname: schema-registry
+    container_name: schema-registry
+    depends_on:
+      - kafka_broker
+    ports:
+      - "8081:8081"
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'kafka_broker:29092'
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+
+  control-center:
+    image: confluentinc/cp-enterprise-control-center:7.2.1
+    hostname: control-center
+    container_name: control-center
+    depends_on:
+      - kafka_broker
+      - schema-registry
+    ports:
+      - "9021:9021"
+    environment:
+      CONTROL_CENTER_BOOTSTRAP_SERVERS: 'kafka_broker:29092'
+      CONTROL_CENTER_SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
+      CONTROL_CENTER_REPLICATION_FACTOR: 1
+      CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS: 1
+      CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS: 1
+      CONFLUENT_METRICS_TOPIC_REPLICATION: 1
+      PORT: 9021
+
+  ## Minio
+  minio:
+    container_name: minio
+    image: quay.io/minio/minio
+    ports:
+      - "9000:9000"
+      - "9090:9090"
+    environment:
+      MINIO_ROOT_USER: "root"
+      MINIO_ROOT_PASSWORD: "password"
+    volumes:
+      - ${PWD}/miniodata/:/data/
+    command: server /data --console-address ":9090"
+
+  ## FLINK
+  jobmanager:
+    container_name: jobmanager
+    image: flink:1.16-java11
+    depends_on:
+      - minio
+    ports:
+      - "18081:18081"
+    command: jobmanager   
+    environment:
+      - ENABLE_BUILT_IN_PLUGINS=flink-s3-fs-presto-1.16.0.jar
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        rest.port: 18081
+        state.backend: rocksdb
+        state.backend.incremental: true
+        execution.checkpointing.unaligned: true
+        s3.endpoint: http://minio:9000
+        s3.path.style.access: true
+        s3.access-key: root
+        s3.secret-key: password
+
+  taskmanager:
+    container_name: taskmanager
+    image: flink:1.16-java11
+    depends_on:
+      - jobmanager
+      - minio
+    command: taskmanager
+    environment:
+      - ENABLE_BUILT_IN_PLUGINS=flink-s3-fs-presto-1.16.0.jar
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        rest.port: 18081
+        taskmanager.numberOfTaskSlots: 2
+        state.backend: rocksdb
+        state.backend.incremental: true
+        execution.checkpointing.unaligned: true
+        s3.endpoint: http://minio:9000
+        s3.path.style.access: true
+        s3.access-key: root
+        s3.secret-key: password
+
+  sql-client:
+    container_name: sql-client
+    depends_on:
+      - jobmanager
+      - taskmanager
+    build:
+      context: .
+      dockerfile: sql-client/Dockerfile
+    environment:
+      FLINK_JOBMANAGER_HOST: jobmanager
+    volumes:
+      - type: bind
+        source: ${PWD}/sql-client/flink-conf.yaml
+        target: /opt/flink/conf/flink-conf.yaml
+      - type: bind
+        source: ${PWD}/sql-jobs/synthetic-join.sql
+        target: /opt/sql-client/synthetic-join.sql
+      - type: bind
+        source: ${PWD}/sql-jobs/alerts.sql
+        target: /opt/sql-client/alerts.sql

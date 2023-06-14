@@ -1,0 +1,216 @@
+{
+    "type": "kafka",
+    "spec": {
+      "dataSchema": {
+        "dataSource": "DEVICES",
+        "timestampSpec": {
+          "column": "!!!_no_such_column_!!!",
+          "format": "auto",
+          "missingValue": "2010-01-01T00:00:00.000Z"
+        },
+        "dimensionsSpec": {
+          "dimensions": [
+            {
+              "type": "string",
+              "name": "payload.location.city",
+              "multiValueHandling": "SORTED_ARRAY",
+              "createBitmapIndex": true
+            },
+            {
+              "type": "string",
+              "name": "payload.location.countryCode",
+              "multiValueHandling": "SORTED_ARRAY",
+              "createBitmapIndex": true
+            },
+            {
+              "type": "string",
+              "name": "location",
+              "multiValueHandling": "SORTED_ARRAY",
+              "createBitmapIndex": true
+            },
+            {
+              "type": "string",
+              "name": "payload.location.region",
+              "multiValueHandling": "SORTED_ARRAY",
+              "createBitmapIndex": true
+            },
+            {
+              "type": "string",
+              "name": "payload.location.timezone",
+              "multiValueHandling": "SORTED_ARRAY",
+              "createBitmapIndex": true
+            },
+            {
+              "type": "string",
+              "name": "deviceId",
+              "multiValueHandling": "SORTED_ARRAY",
+              "createBitmapIndex": true
+            },
+            {
+              "type": "float",
+              "name": "latitude",
+              "multiValueHandling": "SORTED_ARRAY",
+              "createBitmapIndex": false
+            },
+            {
+              "type": "float",
+              "name": "longitude",
+              "multiValueHandling": "SORTED_ARRAY",
+              "createBitmapIndex": false
+            }
+          ],
+          "dimensionExclusions": [
+            "__time",
+            "!!!_no_such_column_!!!"
+          ],
+          "includeAllDimensions": false
+        },
+        "metricsSpec": [],
+        "granularitySpec": {
+          "type": "uniform",
+          "segmentGranularity": {
+            "type": "all"
+          },
+          "queryGranularity": {
+            "type": "none"
+          },
+          "rollup": false,
+          "intervals": []
+        },
+        "transformSpec": {
+          "filter": null,
+          "transforms": [
+            {
+              "type": "expression",
+              "name": "latitude",
+              "expression": "regexp_extract(location, '^(-?\\\\d+(?:\\\\.\\\\d+)?)')"
+            },
+            {
+              "type": "expression",
+              "name": "longitude",
+              "expression": "regexp_extract(location, '(-?\\\\d+(?:\\\\.\\\\d+)?)$')"
+            }
+          ]
+        }
+      },
+      "ioConfig": {
+        "topic": "DEVICES",
+        "inputFormat": {
+          "type": "json",
+          "flattenSpec": {
+            "useFieldDiscovery": true,
+            "fields": [
+              {
+                "type": "path",
+                "name": "payload.location.city",
+                "expr": "$.payload.location.city",
+                "nodes": null
+              },
+              {
+                "type": "path",
+                "name": "payload.location.countryCode",
+                "expr": "$.payload.location.countryCode",
+                "nodes": null
+              },
+              {
+                "type": "path",
+                "name": "location",
+                "expr": "$.payload.location.loc",
+                "nodes": null
+              },
+              {
+                "type": "path",
+                "name": "payload.location.region",
+                "expr": "$.payload.location.region",
+                "nodes": null
+              },
+              {
+                "type": "path",
+                "name": "payload.location.timezone",
+                "expr": "$.payload.location.timezone",
+                "nodes": null
+              }
+            ]
+          },
+          "keepNullColumns": true,
+          "assumeNewlineDelimited": false,
+          "useJsonNodeReader": false
+        },
+        "replicas": 1,
+        "taskCount": 1,
+        "taskDuration": "PT3600S",
+        "consumerProperties": {
+          "bootstrap.servers": "kafka_broker:29092"
+        },
+        "autoScalerConfig": null,
+        "pollTimeout": 100,
+        "startDelay": "PT5S",
+        "period": "PT30S",
+        "useEarliestOffset": true,
+        "completionTimeout": "PT1800S",
+        "lateMessageRejectionPeriod": null,
+        "earlyMessageRejectionPeriod": null,
+        "lateMessageRejectionStartDateTime": null,
+        "configOverrides": null,
+        "idleConfig": null,
+        "stream": "DEVICES",
+        "useEarliestSequenceNumber": true
+      },
+      "tuningConfig": {
+        "type": "kafka",
+        "appendableIndexSpec": {
+          "type": "onheap",
+          "preserveExistingMetrics": false
+        },
+        "maxRowsInMemory": 1000000,
+        "maxBytesInMemory": 0,
+        "skipBytesInMemoryOverheadCheck": false,
+        "maxRowsPerSegment": 5000000,
+        "maxTotalRows": null,
+        "intermediatePersistPeriod": "PT10M",
+        "maxPendingPersists": 0,
+        "indexSpec": {
+          "bitmap": {
+            "type": "roaring",
+            "compressRunOnSerialization": true
+          },
+          "dimensionCompression": "lz4",
+          "stringDictionaryEncoding": {
+            "type": "utf8"
+          },
+          "metricCompression": "lz4",
+          "longEncoding": "longs"
+        },
+        "indexSpecForIntermediatePersists": {
+          "bitmap": {
+            "type": "roaring",
+            "compressRunOnSerialization": true
+          },
+          "dimensionCompression": "lz4",
+          "stringDictionaryEncoding": {
+            "type": "utf8"
+          },
+          "metricCompression": "lz4",
+          "longEncoding": "longs"
+        },
+        "reportParseExceptions": false,
+        "handoffConditionTimeout": 0,
+        "resetOffsetAutomatically": false,
+        "segmentWriteOutMediumFactory": null,
+        "workerThreads": null,
+        "chatThreads": null,
+        "chatRetries": 8,
+        "httpTimeout": "PT10S",
+        "shutdownTimeout": "PT80S",
+        "offsetFetchPeriod": "PT30S",
+        "intermediateHandoffPeriod": "P2147483647D",
+        "logParseExceptions": false,
+        "maxParseExceptions": 2147483647,
+        "maxSavedParseExceptions": 0,
+        "skipSequenceNumberAvailabilityCheck": false,
+        "repartitionTransitionDuration": "PT120S"
+      }
+    },
+    "context": null,
+    "suspended": false
+  }

@@ -1,0 +1,179 @@
+{
+    "type": "kafka",
+    "spec": {
+      "dataSchema": {
+        "dataSource": "EVENTS_GEO",
+        "timestampSpec": {
+          "column": "eventTimestamp",
+          "format": "iso",
+          "missingValue": null
+        },
+        "dimensionsSpec": {
+          "dimensions": [
+            {
+              "type": "string",
+              "name": "deviceId",
+              "multiValueHandling": "SORTED_ARRAY",
+              "createBitmapIndex": true
+            },
+            {
+              "type": "string",
+              "name": "deviceCity",
+              "multiValueHandling": "SORTED_ARRAY",
+              "createBitmapIndex": true
+            },
+            {
+              "type": "string",
+              "name": "deviceRegion",
+              "multiValueHandling": "SORTED_ARRAY",
+              "createBitmapIndex": true
+            },
+            {
+              "type": "string",
+              "name": "messageName",
+              "multiValueHandling": "SORTED_ARRAY",
+              "createBitmapIndex": true
+            },
+            {
+              "type": "string",
+              "name": "eventNotificationName",
+              "multiValueHandling": "SORTED_ARRAY",
+              "createBitmapIndex": true
+            },
+            {
+              "type": "string",
+              "name": "timestamp",
+              "multiValueHandling": "SORTED_ARRAY",
+              "createBitmapIndex": true
+            },
+            {
+              "type": "float",
+              "name": "deviceLatitude",
+              "multiValueHandling": "SORTED_ARRAY",
+              "createBitmapIndex": false
+            },
+            {
+              "type": "float",
+              "name": "deviceLongitude",
+              "multiValueHandling": "SORTED_ARRAY",
+              "createBitmapIndex": false
+            }
+          ],
+          "dimensionExclusions": [
+            "__time",
+            "eventTimestamp"
+          ],
+          "includeAllDimensions": false
+        },
+        "metricsSpec": [],
+        "granularitySpec": {
+          "type": "uniform",
+          "segmentGranularity": "DAY",
+          "queryGranularity": {
+            "type": "none"
+          },
+          "rollup": false,
+          "intervals": []
+        },
+        "transformSpec": {
+          "filter": null,
+          "transforms": [
+            {
+              "type": "expression",
+              "name": "deviceLatitude",
+              "expression": "regexp_extract(deviceLocation, '^(-?\\\\d+(?:\\\\.\\\\d+)?)')"
+            },
+            {
+              "type": "expression",
+              "name": "deviceLongitude",
+              "expression": "regexp_extract(deviceLocation, '(-?\\\\d+(?:\\\\.\\\\d+)?)$')"
+            }
+          ]
+        }
+      },
+      "ioConfig": {
+        "topic": "EVENTS_GEO",
+        "inputFormat": {
+          "type": "json",
+          "keepNullColumns": false,
+          "assumeNewlineDelimited": false,
+          "useJsonNodeReader": false
+        },
+        "replicas": 1,
+        "taskCount": 1,
+        "taskDuration": "PT3600S",
+        "consumerProperties": {
+          "bootstrap.servers": "kafka_broker:29092"
+        },
+        "autoScalerConfig": null,
+        "pollTimeout": 100,
+        "startDelay": "PT5S",
+        "period": "PT30S",
+        "useEarliestOffset": true,
+        "completionTimeout": "PT1800S",
+        "lateMessageRejectionPeriod": null,
+        "earlyMessageRejectionPeriod": null,
+        "lateMessageRejectionStartDateTime": null,
+        "configOverrides": null,
+        "idleConfig": null,
+        "stream": "EVENTS_GEO",
+        "useEarliestSequenceNumber": true
+      },
+      "tuningConfig": {
+        "type": "kafka",
+        "appendableIndexSpec": {
+          "type": "onheap",
+          "preserveExistingMetrics": false
+        },
+        "maxRowsInMemory": 1000000,
+        "maxBytesInMemory": 0,
+        "skipBytesInMemoryOverheadCheck": false,
+        "maxRowsPerSegment": 5000000,
+        "maxTotalRows": null,
+        "intermediatePersistPeriod": "PT10M",
+        "maxPendingPersists": 0,
+        "indexSpec": {
+          "bitmap": {
+            "type": "roaring",
+            "compressRunOnSerialization": true
+          },
+          "dimensionCompression": "lz4",
+          "stringDictionaryEncoding": {
+            "type": "utf8"
+          },
+          "metricCompression": "lz4",
+          "longEncoding": "longs"
+        },
+        "indexSpecForIntermediatePersists": {
+          "bitmap": {
+            "type": "roaring",
+            "compressRunOnSerialization": true
+          },
+          "dimensionCompression": "lz4",
+          "stringDictionaryEncoding": {
+            "type": "utf8"
+          },
+          "metricCompression": "lz4",
+          "longEncoding": "longs"
+        },
+        "reportParseExceptions": false,
+        "handoffConditionTimeout": 0,
+        "resetOffsetAutomatically": false,
+        "segmentWriteOutMediumFactory": null,
+        "workerThreads": null,
+        "chatThreads": null,
+        "chatRetries": 8,
+        "httpTimeout": "PT10S",
+        "shutdownTimeout": "PT80S",
+        "offsetFetchPeriod": "PT30S",
+        "intermediateHandoffPeriod": "P2147483647D",
+        "logParseExceptions": false,
+        "maxParseExceptions": 2147483647,
+        "maxSavedParseExceptions": 0,
+        "skipSequenceNumberAvailabilityCheck": false,
+        "repartitionTransitionDuration": "PT120S"
+      }
+    },
+    "context": null,
+    "suspended": false
+  }

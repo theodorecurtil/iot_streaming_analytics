@@ -1,0 +1,1 @@
+{"query" : "SELECT deviceId, latitude, longitude FROM DEVICES"}
