@@ -111,6 +111,8 @@ The Druid docker-compose file requires the name of the Docker network to run on.
 
 The `start` script will also prompt you for your Mapbox API key, so have it ready. In case you do not want to make the account with Mapbox, you can just type in a random string or nothing at all. Script execution and everything else will work, you just won't have map data in the Superset dashboard.
 
+At some point, the `start` script will prompt you to clean and reset the Druid database, and then to start the Python producers. Before continuing with the script execution, perform the sanity check below.
+
 ### :medical_symbol: Sanity Check
 
 To check that all the services are up and running (you will see that a lot of Docker containers are running by now), visit the following urls and check that all the UIs load properly:
@@ -122,11 +124,11 @@ To check that all the services are up and running (you will see that a lot of Do
 
 You should see something like
 
-![](./pictures/all_uis.png)
+![Kafka, Flink, Druid and Superset user interfaces](./pictures/all_uis.png)
 
 The relationship between all the services is illustrated with the flow diagram below.
 
-![](./pictures/flow_diagram.png)
+![Kafka, Flink, Druid and Superset architecture](./pictures/flow_diagram.png)
 
 In the following sections, we will see how to setup the stream ingestion by Apache Druid from our Kafka cluster; and then how to link Druid to Superset to create real-time dashboards!
 
@@ -285,24 +287,20 @@ As expected, the two charts are identical, as the same aggregation is performed;
 
 ## :skull_and_crossbones: Tear the Infrastructure Down
 
-When you are done playing with Superset, follow these steps to stop the whole infrastructure. We will first bring Druid and Superset down, and then shut Flink, Kafka and the Avro records producer. The commands are shown below.
+When you are done playing with the project, follow the step below to stop the whole infrastructure.
 
 ```bash
-## In the real_time_dashboarding directory
+## In the iot_streaming_analytics directory
 ./stop.sh
-
-## Change to the flink_sql_job directory
-cd ../flink_sql_job
-
-## docker-compose down
-docker-compose down
 ```
 
-Again, make sure that the `stop.sh` script in the `real_time_dashboarding` folder is executable.
+Again, make sure that the `stop.sh` script in the `iot_streaming_analytics` folder is executable.
 
 ## :pushpin: Conclusion
 
-In this blog post, we covered the full data pipeline from end to end, from raw data creation with the Kafka producer, producing high quality data records to Kafka using Avro schema and the schema registry. Then we have the streaming analytics pipeline with the Flink cluster performing time aggregation on the raw data and sinking back to Kafka. We have also covered how to get started with Apache Druid as a real-time OLAP database that allows persiting the records from Kafka, and fast-querying. Lastly, we saw how to connect our streaming database to Superset to produce insightful visualizations and dashboards. Superset acts here as our BI tool.
+In this blog post, we demonstrated the solution we implemented for a customer, to perform streaming analytics and produce real-time insights using Kafka, Flink, Druid and Superset.
+
+In case you have any questions or wish to know more about our services, you can visit us at [acosom.com](https://acosom.com/en?utm_source=github&utm_medium=social&utm_campaign=repo-iot-streaming-analytics).
 
 <!---------------------------------------------------------------------------->
 
