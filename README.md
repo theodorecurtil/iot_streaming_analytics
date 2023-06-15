@@ -6,7 +6,7 @@
 
 ## :bulb: Introduction
 
-In this new blog post (or github repo), we show you a use case we had to solve for a customer, in the IoT business.
+In this new blog post (or github repo), we show you a use case we had to solve for a customer, in the IoT business. In this specific use-case, we want to build a dashboard to quickly identify which devices have a behaviour deviating from normal behaviour. For instance, it could be connected doors located in a city, with an area having a network disruption causing all doors to reject access to users in this area. With streaming analytics, we can identify those events as they arrive and notify users or support about the disruption of service.
 
 The end-product is a dashboard with live, streaming analytics. It looks like the below.
 
@@ -128,7 +128,7 @@ You should see something like
 
 The relationship between all the services is illustrated with the flow diagram below.
 
-![Kafka, Flink, Druid and Superset architecture](./pictures/flow_diagram.png)
+![Kafka, Flink, Druid and Superset architecture](./pictures/flow_diagram.svg)
 
 In the following sections, we will see how to setup the stream ingestion by Apache Druid from our Kafka cluster; and then how to link Druid to Superset to create real-time dashboards!
 
