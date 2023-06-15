@@ -212,6 +212,6 @@ In case you have any questions or wish to know more about our services, you can 
 [Button Twitter]: https://img.shields.io/twitter/follow/theodore_curtil?style=social
 [Button Linkedin]: https://img.shields.io/badge/LinkedIn-Follow%20Acosom-blue
 
-[LinkAcosom]: https://acosom.com/en/blog/kafka-101-tutorial-real-time-dashboarding-with-druid-and-superset/?utm_source=github&utm_medium=social&utm_campaign=blog 'Read on acosom.com'
+[LinkAcosom]: https://acosom.com/en/blog/iot-streaming-analytics-with-kafka-flink-druid-and-superset/?utm_source=github&utm_medium=social&utm_campaign=blog 'Read on acosom.com'
 [LinkTwitter]: https://twitter.com/theodore_curtil 'Follow me on Twitter :)'
 [LinkLinkedin]: https://ch.linkedin.com/company/acosom 'Follow us on LinkedIn :)'
