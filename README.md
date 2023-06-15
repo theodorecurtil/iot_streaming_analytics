@@ -10,7 +10,7 @@ In this new blog post (or github repo), we show you a use case we had to solve f
 
 The end-product is a dashboard with live, streaming analytics. It looks like the below.
 
-DASHBOARD SCREENSHOT HERE
+![Superset dashboard](./pictures/iot-streaming-analytics-2023-06-15T09-45-33.487Z.jpg)
 
 We will be using the following technologies:
 
