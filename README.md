@@ -130,6 +130,61 @@ The relationship between all the services is illustrated with the flow diagram b
 
 ![Kafka, Flink, Druid and Superset architecture](./pictures/flow_diagram.svg)
 
+### :framed_picture: Upload Superset Dashboard
+
+In Superset, upload the dashboard located in `./superset_dashboard/IOT-STREAMING-ANALYTICS.zip` to Superset.
+
+After you checked that all services are up and running, we can start the synthetic data producers.
+
+### :play_or_pause_button: Start Kafka Producers
+
+At this stage, you should be prompted in the terminal to start the producers that produce data to the Kafka cluster. Open up a new terminal window and `cd` into the `producers` directory.
+
+First, we will produce the devices data to the Kafka cluster. Data looks as follows
+
+```json
+{
+    "deviceId": "b90f632f-02a2-475b-a0bd-a4353b26fd84",
+    "payload": {
+        "location": {
+            "countryCode": "CH",
+            "region": "Zurich",
+            "city": "Zürich",
+            "loc": "47.3757424811726,8.529675964932226",
+            "timezone": "Europe/Zurich"
+        }
+    }
+}
+```
+
+with the device ID and its location in a nested JSON field. Type the following command to produce 1000 devices data points to Kafka.
+
+```bash
+conda activate <env-name>
+
+python producer_devices.py
+```
+
+You should be able to see the data in the Kafka topic and in the Druid `DEVICES` table already. Also, the Superset dashboard should already show the devices on a map of Zürich.
+
+Next step is to start producing some IoT events to Kafka, to simulate the devices sending operation notifications. To do so run the following command.
+
+```bash
+python producer_events.py false &
+```
+
+This will produce normal events to the Kafka cluster in a background task. Normal events mean that doors mostly produce some `accessGranted` notifications. Now, we will introduce a network disruption in a part of the city (Wiedikon), where devices in this area will start producing `accessRejected` events only. Type the following command.
+
+```bash
+python producer_events.py true &
+```
+
+### :chipmunk: Start the Flink Jobs
+
+Going back to the main terminal window, press Enter once you have run the producers code, and press Enter again when prompted to start the Flink jobs.
+
+At this stage, the dashboard should show multiple charts, with a clearly identifiable area of disruption, where the count of `accessRejected` events was abnormally high for a period of time.
+
 ## :skull_and_crossbones: Tear the Infrastructure Down
 
 When you are done playing with the project, follow the step below to stop the whole infrastructure.
