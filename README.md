@@ -41,7 +41,7 @@ To get this project running, you will need the following:
 1. [Docker](https://www.docker.com/)
 2. [Docker Compose](https://docs.docker.com/compose/) to orchestrate the infrastructure.
 3. [Miniconda](https://docs.conda.io/en/latest/miniconda.html) to create a Python virtual environment and run the Python scripts.
-4. [A Mapbox API key](https://www.mapbox.com/) to have map data inside Superset.
+4. [A Mapbox API key](https://www.mapbox.com/) to have map data inside Superset. For that, you simply need to create a free account with Mapbox which will give you a free API key with more than enough credits.
 
 The versions I used to build the project are
 
@@ -60,37 +60,42 @@ conda --version
 
 ## Python
 python --version
-Python 3.11.3
+> Python 3.11.3
 ```
 
 If your versions are different, it should not be a big problem. Though, some of the following might raise warnings or errors that you should debug on your own.
 
 ## :snake: Python Virtual Environment
 
+To have all the python dependencies required to run the Kafka producers and other Python scripts inside this project, I would recommend setting up a virtual environment with Miniconda.
 
+To do that, make sure you have Miniconda installed on your computer, which should give you the shell command `conda`.
+
+From inside the project, type the following commands
+
+```bash
+## Create env
+conda create -n <env-name> python=3.11
+
+## Activate the env
+conda activate <env-name>
+
+## Install Python libraries
+pip install -r requirements.txt
+```
+
+With this, you are good to go! Remember to always activate the virtual environment when you run Python scripts from this project.
 
 ## :factory: Infrastructure
 
-To have everything up and running, you will need to have the whole producer part running ([the repo from the previous article](https://github.com/theodorecurtil/flink_sql_job)) and Druid and Superset. To do this, do the following:
+To have everything up and running, you will simply need to run the `start.sh` script, that will start the whole infrastructure for you.
 
 ```bash
 ## Clone the repo
-git clone https://github.com/theodorecurtil/flink_sql_job.git
+git clone https://github.com/theodorecurtil/iot_streaming_analytics.git
 
 ## cd into the repo
-cd flink_sql_job
-
-## docker-compose the infra
-docker-compose up -d
-
-## go back to previous level
-cd ..
-
-## Clone the new repo
-git clone git@github.com:theodorecurtil/real_time_dashboarding.git
-
-## cd into the repo
-cd real_time_dashboarding
+cd iot_streaming_analytics
 
 ## start the infrastructure
 ./start.sh
@@ -102,9 +107,11 @@ cd real_time_dashboarding
 chmod +x start.sh
 ```
 
-The Druid [docker-compose](https://github.com/theodorecurtil/real_time_dashboarding/blob/main/druid_setup/docker-compose.yaml) file assumes that the Kafka cluster is running on the Docker network `flink_sql_job_default`. It should be the case if you cloned the `flink_sql_job` repo and started the infra using the commands listed before. Otherwise, simply adjust the references to the `flink_sql_job_default` Docker network in the `docker-compose` file.
+The Druid docker-compose file requires the name of the Docker network to run on. You will be prompted during the run of the `start` script. If you did not change the name of the default Docker network, then it should be `<name-of-project-directoy>_default`, so you can simply hit Enter when prompted for the name of the network. Otherwise, you can also type in the name of the Docker network you wish to connect to.
 
-### Sanity Check
+The `start` script will also prompt you for your Mapbox API key, so have it ready. In case you do not want to make the account with Mapbox, you can just type in a random string or nothing at all. Script execution and everything else will work, you just won't have map data in the Superset dashboard.
+
+### :medical_symbol: Sanity Check
 
 To check that all the services are up and running (you will see that a lot of Docker containers are running by now), visit the following urls and check that all the UIs load properly:
 
