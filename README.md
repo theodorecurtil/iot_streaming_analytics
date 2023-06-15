@@ -6,9 +6,13 @@
 
 ## :bulb: Introduction
 
-In this new blog post (or github repo), we show you a use case we had to solve for a customer, in the IoT business. In this specific use-case, we want to build a dashboard to quickly identify which devices have a behaviour deviating from normal behaviour. For instance, it could be connected doors located in a city, with an area having a network disruption causing all doors to reject access to users in this area. With streaming analytics, we can identify those events as they arrive and notify users or support about the disruption of service.
+In this new blog post (or github repo), we present a case study concerning one of our customer in the domain of Internet of Things (IoT). In this specific use-case, we want to build a dashboard to quickly identify which devices have a behaviour deviating from the measured norm.
 
-The end-product is a dashboard with live, streaming analytics. It looks like the below.
+For instance, it could be connected doors located in a city, with an area having a network disruption causing all doors to reject access to users in this area.
+
+With streaming analytics, we can identify those events as they arrive and notify users or support about the disruption of service.
+
+The end-product is a dashboard with live, streaming analytics. It appears as below.
 
 ![Superset dashboard](./pictures/iot-streaming-analytics-2023-06-15T09-45-33.487Z.jpg)
 
@@ -18,6 +22,10 @@ We will be using the following technologies:
 2. [Apache Flink](https://flink.apache.org/)
 3. [Apache Druid](https://druid.apache.org/)
 4. [Apache Superset](https://superset.apache.org/)
+
+The architecture with Apache Kafka acting as central nervous system is described below.
+
+![Kafka, Flink, Druid and Superset architecture](./pictures/flow_diagram.svg)
 
 We will be using Apache Kafka as our central data system with which all other services will interact to either consume (read) or produce (write) data. Druid will be our database to ingest and persist our Kafka topics and analytics, and Superset will be our BI tool to produce real-time dashboards querying against Druid. Flink will also join the fun as our stream-processing engine and will be given two jobs:
 
@@ -125,10 +133,6 @@ To check that all the services are up and running (you will see that a lot of Do
 You should see something like
 
 ![Kafka, Flink, Druid and Superset user interfaces](./pictures/all_uis.png)
-
-The relationship between all the services is illustrated with the flow diagram below.
-
-![Kafka, Flink, Druid and Superset architecture](./pictures/flow_diagram.svg)
 
 ### :framed_picture: Upload Superset Dashboard
 
