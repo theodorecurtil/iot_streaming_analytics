@@ -6,11 +6,7 @@
 
 ## :bulb: Introduction
 
-In this new blog post (or github repo), we present a case study concerning one of our customer in the domain of Internet of Things (IoT). In this specific use-case, we want to build a dashboard to quickly identify which devices have a behaviour deviating from the measured norm.
-
-For instance, it could be connected doors located in a city, with an area having a network disruption causing all doors to reject access to users in this area.
-
-With streaming analytics, we can identify those events as they arrive and notify users or support about the disruption of service.
+In this new blog post (or github repo), we present a case study concerning one of our customer in the domain of Internet of Things (IoT). In this specific use-case, we want to build a dashboard to quickly identify which devices have a behaviour deviating from the measured norm. For instance, it could be connected doors located in a city, with an area having a network disruption causing all doors to reject access to users in this area. With streaming analytics, we can identify those events as they arrive and notify users or support about the disruption of service.
 
 The end-product is a dashboard with live, streaming analytics. It appears as below.
 
